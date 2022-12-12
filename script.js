@@ -5,24 +5,16 @@ const resultLabelEl = document.getElementById('result-label');
 const buttonRestart = document.getElementById('button-restart');
 const scoreContentEl = document.querySelector('.score-content');
 const canvas = document.querySelector('canvas');
+let idIntervalEnemies = '';
 let score = 0;
 let idAnimation;
+let x = 0; // position player
+let y = 0; // position player
 
-// set size canvas
-canvas.width = 0.8 * innerWidth;
-canvas.height = 0.8 * innerHeight;
-const x = canvas.width / 2;
-const y = canvas.height / 2;
-
+let projectiles = [];
+let enemies = [];
+let particles = [];
 const ctx = canvas.getContext('2d');
-
-scoreContentEl.style.display = 'none';
-resultLabelEl.style.display = 'none';
-
-addEventListener('resize', () => {
-  canvas.width = 0.8 * innerWidth;
-  canvas.height = 0.8 * innerHeight;
-});
 
 class Player {
   constructor(x, y, radius, color) {
@@ -118,16 +110,34 @@ class Particle {
 
 // const player = new Player(x, y, 30, '#0cdcfc');
 let player = new Player(x, y, 30, '#911072');
-let projectiles = [];
-let enemies = [];
-let particles = [];
+
+// set size canvas
+const setSizeCanvas = () => {
+  if (innerWidth < 550) {
+    canvas.width = 0.9 * innerWidth;
+    canvas.height = 0.8 * innerHeight;
+  } else {
+    canvas.width = 0.8 * innerWidth;
+    canvas.height = 0.8 * innerHeight;
+  }
+  x = canvas.width / 2;
+  y = canvas.height / 2;
+};
+
+const resetDisplayModal = () => {
+  scoreContentEl.style.display = 'none';
+  resultLabelEl.style.display = 'none';
+  resultValueEl.innerHTML = 'Are you <br />In The Game ?';
+};
 
 const init = () => {
+  scoreValueEl.innerText = '0';
   score = 0;
   player = new Player(x, y, 30, '#911072');
   projectiles = [];
   enemies = [];
   particles = [];
+  clearInterval(idIntervalEnemies);
   animate();
   displayEnemies();
   modalResult.style.display = 'none';
@@ -135,7 +145,7 @@ const init = () => {
 
 const displayEnemies = () => {
   const colors = ['#f4d35e', '#ee964b', '#ff5964'];
-  setInterval(() => {
+  idIntervalEnemies = setInterval(() => {
     const radius = Math.random() * 35 + 5;
     let x;
     let y;
@@ -185,7 +195,6 @@ const animate = () => {
       projectile.y + projectile.radius < 0 ||
       projectile.y > canvas.heigh + projectile.radius
     ) {
-      console.log('out');
       setTimeout(() => {
         projectiles.splice(indexProjectile, 1);
       }, 0);
@@ -259,15 +268,23 @@ const animate = () => {
   });
 };
 
+setSizeCanvas();
+resetDisplayModal();
+
 ////////////////////////////////////
 // Event listener
 ////////////////////////////////////
 
 addEventListener('click', ({ clientX, clientY }) => {
-  //   console.log(clientX, clientY);
-  console.log(projectiles);
-  const xCursor = clientX - 0.1 * innerWidth;
+  let xCursor;
+  // define xCursor according to the innerWidth
   const yCursor = clientY - 0.1 * innerHeight;
+  if (innerWidth < 550) {
+    xCursor = clientX - 0.05 * innerWidth;
+  } else {
+    xCursor = clientX - 0.1 * innerWidth;
+  }
+
   const angle = Math.atan2(
     yCursor - canvas.height / 2,
     xCursor - canvas.width / 2
@@ -276,12 +293,25 @@ addEventListener('click', ({ clientX, clientY }) => {
     x: Math.cos(angle) * 5,
     y: Math.sin(angle) * 5,
   };
-  console.log('angle', angle);
   projectiles.push(
     new Projectile(canvas.width / 2, canvas.height / 2, 5, '#0CDCFC', velocity)
   );
-  //   projectile.draw();
-  //   projec;
 });
 
 buttonRestart.addEventListener('click', () => init());
+
+addEventListener('resize', () => {
+  cancelAnimationFrame(idAnimation);
+  resetDisplayModal();
+  modalResult.style.display = 'block';
+
+  if (innerWidth < 550) {
+    canvas.width = 0.9 * innerWidth;
+    canvas.height = 0.8 * innerHeight;
+  } else {
+    canvas.width = 0.8 * innerWidth;
+    canvas.height = 0.8 * innerHeight;
+  }
+  x = canvas.width / 2;
+  y = canvas.height / 2;
+});
