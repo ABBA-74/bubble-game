@@ -1,3 +1,4 @@
+const earthImg = document.getElementById('earth');
 const scoreValueEl = document.getElementById('score-value');
 const modalResult = document.getElementById('modal-result');
 const resultValueEl = document.getElementById('result-value');
@@ -22,13 +23,24 @@ class Player {
     this.y = y;
     this.radius = radius;
     this.color = color;
+    this.image = earthImg;
   }
 
   draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
+    // ctx.beginPath();
+    // ctx.shadowColor = 'red';
+    // ctx.shadowBlur = 3;
+    // ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    // ctx.fillStyle = this.color;
+    // ctx.fill();
+
+    ctx.drawImage(
+      this.image,
+      this.x - this.radius,
+      this.y - this.radius,
+      this.radius * 2,
+      this.radius * 2
+    );
   }
 }
 
@@ -66,8 +78,23 @@ class Enemy {
 
   draw() {
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
+    const innerRadius = 5;
+    const outerRadius = this.radius * 1.81;
+
+    const gradient = ctx.createRadialGradient(
+      this.x,
+      this.y,
+      innerRadius,
+      this.x,
+      this.y,
+      outerRadius
+    );
+    gradient.addColorStop(0, this.color);
+    gradient.addColorStop(1, '#ffffffa1');
+
+    ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+
+    ctx.fillStyle = gradient;
     ctx.fill();
   }
 
@@ -107,9 +134,6 @@ class Particle {
     this.alpha -= 0.005;
   }
 }
-
-// const player = new Player(x, y, 30, '#0cdcfc');
-let player = new Player(x, y, 30, '#911072');
 
 // set size canvas
 const setSizeCanvas = () => {
@@ -270,6 +294,8 @@ const animate = () => {
 
 setSizeCanvas();
 resetDisplayModal();
+// const player = new Player(x, y, 30, '#0cdcfc');
+let player = new Player(x, y, 30, '#911072');
 
 ////////////////////////////////////
 // Event listener
@@ -304,14 +330,5 @@ addEventListener('resize', () => {
   cancelAnimationFrame(idAnimation);
   resetDisplayModal();
   modalResult.style.display = 'block';
-
-  if (innerWidth < 550) {
-    canvas.width = 0.9 * innerWidth;
-    canvas.height = 0.8 * innerHeight;
-  } else {
-    canvas.width = 0.8 * innerWidth;
-    canvas.height = 0.8 * innerHeight;
-  }
-  x = canvas.width / 2;
-  y = canvas.height / 2;
+  setSizeCanvas();
 });

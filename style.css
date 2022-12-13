@@ -8,6 +8,7 @@ html,
 body {
   position: relative;
   width: 100vw;
+  height: 100vh;
 }
 body {
   font-size: 1rem;
@@ -52,6 +53,7 @@ canvas {
   border-radius: 1rem;
   box-shadow: 0 15px 20px rgb(14, 1, 36);
   border-bottom: 3px solid rgba(223, 223, 223, 0.11);
+  max-width: 100%;
 }
 
 #container-score {
@@ -92,6 +94,7 @@ canvas {
   max-width: 25rem;
   width: 90vw;
   height: 15rem;
+  height: clamp(10rem, 90vh, 15rem);
   border-radius: 1rem;
   margin-inline: auto;
   background: linear-gradient(
@@ -150,6 +153,9 @@ canvas {
   box-shadow: none;
 }
 
+#earth {
+  display: none;
+}
 /*******************/
 /*** media query ***/
 /*******************/
@@ -169,6 +175,9 @@ canvas {
 @media screen and (max-height: 500px) {
   h1 {
     font-size: 1.8rem;
+  }
+  #modal-result {
+    height: clamp(10rem, 90vh, 15rem);
   }
   #modal-result #result-value {
     font-size: 1.5rem;
